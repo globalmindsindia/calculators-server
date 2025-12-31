@@ -1,7 +1,7 @@
-# Unified Study Calculator API
+pip# Unified Study Calculator API
 
 ## Base URL
-`http://localhost:5000`
+`https://api.calculator.globalmindsindia.com`
 
 ## Endpoints
 

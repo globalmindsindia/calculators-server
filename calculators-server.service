@@ -1,0 +1,14 @@
+[Unit]
+Description=Calculators Server Flask Application
+After=network.target
+
+[Service]
+User=your-username
+Group=your-groupname
+WorkingDirectory=/path/to/your/calculators-server
+Environment="PATH=/path/to/your/calculators-server/venv/bin"
+ExecStart=/path/to/your/calculators-server/venv/bin/gunicorn --bind 0.0.0.0:8000 wsgi:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

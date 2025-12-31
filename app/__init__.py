@@ -31,12 +31,28 @@ def create_app():
         app.config['PDFKIT_CONFIG'] = None
     
     Session(app)
-    CORS(app, origins=['http://localhost:5173', 'http://localhost:3000', 'https://calculator.globalmndsindia.com'], supports_credentials=True)
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": [
+                "https://calculator.globalmindsindia.com",
+                "https://www.globalmindsindia.com",
+                "http://localhost:3000"
+            ],
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }
+    })
     db.init_app(app)
     migrate.init_app(app, db)
 
     from .routes import main
     app.register_blueprint(main)
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        return response
 
     with app.app_context():
         db.create_all()
