@@ -39,7 +39,7 @@ def create_app():
                 "http://localhost:3000"
             ],
             "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
+            "headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
         }
     })
@@ -48,11 +48,6 @@ def create_app():
 
     from .routes import main
     app.register_blueprint(main)
-
-    @app.after_request
-    def after_request(response):
-        response.headers.add('Access-Control-Allow-Credentials', 'true')
-        return response
 
     with app.app_context():
         db.create_all()
