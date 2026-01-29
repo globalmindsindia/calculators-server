@@ -6,15 +6,38 @@ from .grade_calculator import calculate_german_grade
 from .pdf_generator import generate_cost_report_pdf, generate_grade_certificate_pdf, generate_custom_package_pdf
 import traceback
 
-# Define bucket mappings for cost calculator
+# Define updated bucket mappings for cost calculator
 bucket_mapping = {
-    'Bucket-1': 'Passport',
-    'Bucket-2': 'career counselling and pre-application assistance + university application',
-    'Bucket-3': 'aps certification',
-    'Bucket-4': 'ielts / tofel + language training(a1 + a2)',
-    'Bucket-5': 'blocked account, financial assistance, visa process, air ticket(any date), travel insurance',
-    'Bucket-6': 'other services'
+    'Bucket-1': {
+        'cost': 1500,
+        'name': 'PASSPORT'
+    },
+    'Bucket-2': {
+        'cost': 75000,
+        'name': 'Career Counselling and pre-application assistance + University Application'
+    },
+    'Bucket-3': {
+        'cost': 21000,
+        'name': 'APS Certification'
+    },
+    'Bucket-4': {
+        'cost': 75000,
+        'name': 'IELTS / TOFEL + Language Training(German,French,Spanish and more)'
+    },
+    'Bucket-5': {
+        'cost': 125000,
+        'name': 'Visa process'
+    },
+    'Bucket-6': {
+        'cost': 100000,
+        'name': 'Pre and post travel essentials'
+    },
+    'Bucket-7': {
+        'cost': 80000,
+        'name': 'Others'
+    }
 }
+
 
 main = Blueprint('main', __name__)
 
