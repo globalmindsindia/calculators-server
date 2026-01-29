@@ -1,0 +1,30 @@
+{
+  "Bucket-1": {
+    "cost": 1500,
+    "name": "PASSPORT"
+  },
+  "Bucket-2": {
+    "cost": 75000,
+    "name": "Career Counselling and pre-application assistance + University Application"
+  },
+  "Bucket-3": {
+    "cost": 21000,
+    "name": "APS Certification"
+  },
+  "Bucket-4": {
+    "cost": 75000,
+    "name": "IELTS / TOFEL + Language Training(German,French,Spanish and more)"
+  },
+  "Bucket-5": {
+    "cost": 125000,
+    "name": "Visa process"
+  },
+  "Bucket-6": {
+    "cost": 100000,
+    "name": "Pre and post travel essentials"
+  },
+  "Bucket-7": {
+    "cost": 80000,
+    "name": "Others"
+  }
+}

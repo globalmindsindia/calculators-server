@@ -389,88 +389,20 @@ def generate_custom_package_pdf(user_data, selected_packages, total_cost):
     dark_gray = colors.HexColor("#2f4f4f")
     light_gray = colors.HexColor("#808080")
 
-    # Package definitions matching frontend
-    package_definitions = {
-        "passport": {
-            "name": "PASSPORT",
-            "description": "Complete passport application and processing services",
-            "features": [
-                "Review documents",
-                "Generate login & File application",
-                "Obtain appointment",
-                "Followup police verification",
-                "Dispatch status",
-                "PASSPORT FEE ADDED",
-            ],
-        },
-        "counselling": {
-            "name": "Career Counselling and Pre-application Assistance + University Application",
-            "description": "Comprehensive guidance for university selection and applications",
-            "features": [
-                "Detailed profile evaluation",
-                "Mentorship & document analysis",
-                "Eligibility check",
-                "Finalize desired country and course selection",
-                "Evaluation and finalization of the budget",
-                "Statement of purpose preparation & review",
-                "Letter of recommendation preparation & review",
-                "At least 1 university offer guaranteed",
-                "CV writing & profile building",
-                "Application for 6 universities",
-                "Track application status with universities",
-            ],
-        },
-        "aps": {
-            "name": "APS Certification",
-            "description": "Academic evaluation and certification for German universities",
-            "features": [
-                "APS Advice & Documentation ADVICE",
-                "Application process",
-                "Pay APS fee 18000 (included)",
-                "Send post to Delhi",
-                "Getting APS certificate 4 to 6 weeks",
-            ],
-        },
-        "language": {
-            "name": "IELTS / TOEFL + Language Training (A1 + A2)",
-            "description": "Complete language preparation and certification program",
-            "features": [
-                "DEMO CLASS",
-                "Mock test - 80 test series",
-                "Training - hybrid training for 2 months",
-                "Including exam fees 18000",
-                "Level -A1: Hybrid classes for 100 hrs",
-                "Level - A2: Hybrid classes for 100 hrs",
-                "Experience Faculty with real time training",
-            ],
-        },
-        "visa": {
-            "name": "Blocked Account, Financial Assistance, Visa Process, Air Ticket, Travel Insurance",
-            "description": "Complete visa processing and financial assistance package",
-            "features": [
-                "BLOCKED ACCOUNT OPEN",
-                "Bank Account: Both NRO and NRI A/c",
-                "Education Loan upto 50 Lakhs (non collateral)",
-                "Visa Documentation Advice",
-                "Visa appointment via VFS portal",
-                "One way Travel Ticket",
-                "Travel Insurance valid for 2 years (24 months)",
-            ],
-        },
-        "other": {
-            "name": "Other Services",
-            "description": "Additional support services for your study abroad journey",
-            "features": [
-                "Travel kit: All students will be issued a travel essential kit",
-                "Part time job: assistance to get part-time jobs",
-                "Tax registration in Germany",
-                "SIM card services: Prepaid German SIM card",
-                "Airport pickup service",
-                "Germany law briefing",
-                "Student life in Germany briefing",
-            ],
-        },
+    # Calculate total from selected_buckets using backend pricing
+    selected_buckets = user_data.get('selected_buckets', [])
+    bucket_costs = {
+        'Bucket-1': 1500, 'Bucket-2': 75000, 'Bucket-3': 21000,
+        'Bucket-4': 75000, 'Bucket-5': 125000, 'Bucket-6': 100000, 'Bucket-7': 80000
     }
+    calculated_total = sum(bucket_costs.get(bucket, 0) for bucket in selected_buckets)
+    
+    print(f"DEBUG PDF: Selected buckets: {selected_buckets}")
+    print(f"DEBUG PDF: Calculated total: {calculated_total}")
+    
+    # Use package_details for content
+    package_details = user_data.get('package_details', [])
+    print(f"DEBUG PDF: Package details count: {len(package_details)}")
 
     # Header with Logo on left and Addresses on right
     try:
@@ -604,27 +536,26 @@ def generate_custom_package_pdf(user_data, selected_packages, total_cost):
     story.append(user_table)
     story.append(Spacer(1, 30))
 
-    # Total Cost Highlight
-    if total_cost and total_cost > 0:
-        total_cost_table = Table(
-            [[f"Total Package Cost: Rs {total_cost:,} (Indian Rupees)"]],
-            colWidths=[7 * inch],
+    # Total Cost Highlight - use calculated total
+    total_cost_table = Table(
+        [[f"Total Package Cost: Rs {calculated_total:,} (Indian Rupees)"]],
+        colWidths=[7 * inch],
+    )
+    total_cost_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, -1), primary_color),
+                ("TEXTCOLOR", (0, 0), (-1, -1), colors.HexColor("#223877")),
+                ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 18),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("TOPPADDING", (0, 0), (-1, -1), 15),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 15),
+            ]
         )
-        total_cost_table.setStyle(
-            TableStyle(
-                [
-                    ("BACKGROUND", (0, 0), (-1, -1), primary_color),
-                    ("TEXTCOLOR", (0, 0), (-1, -1), colors.HexColor("#223877")),
-                    ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
-                    ("FONTSIZE", (0, 0), (-1, -1), 18),
-                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-                    ("TOPPADDING", (0, 0), (-1, -1), 15),
-                    ("BOTTOMPADDING", (0, 0), (-1, -1), 15),
-                ]
-            )
-        )
-        story.append(total_cost_table)
-        story.append(Spacer(1, 30))
+    )
+    story.append(total_cost_table)
+    story.append(Spacer(1, 30))
 
     # Selected Packages Section
     packages_title = Paragraph(
@@ -639,67 +570,62 @@ def generate_custom_package_pdf(user_data, selected_packages, total_cost):
     )
     story.append(packages_title)
 
-    # Package details
-    for i, package_id in enumerate(selected_packages):
-        if package_id in package_definitions:
-            pkg = package_definitions[package_id]
+    # Show selected packages with correct content from package_details
+    for i, package in enumerate(package_details, 1):
+        # Package header
+        header_style = ParagraphStyle(
+            "PackageHeader",
+            fontSize=12,
+            textColor=dark_gray,
+            fontName="Helvetica-Bold",
+            leftIndent=10,
+            rightIndent=10,
+            spaceAfter=8,
+            backColor=colors.HexColor("#e5e7eb"),
+            borderPadding=8,
+        )
+        story.append(Paragraph(f"{i}. {package.get('name', 'Unknown').upper()}", header_style))
 
-            # Package header with proper text wrapping for long names
-            header_style = ParagraphStyle(
-                "PackageHeader",
-                fontSize=12,
+        # Package description
+        desc_style = ParagraphStyle(
+            "PackageDesc",
+            fontSize=10,
+            textColor=light_gray,
+            fontName="Helvetica-Oblique",
+            leftIndent=10,
+            rightIndent=10,
+            spaceAfter=6,
+        )
+        story.append(Paragraph(package.get('description', 'No description available'), desc_style))
+
+        # Features header
+        features_header = Paragraph(
+            "Included Services:",
+            ParagraphStyle(
+                "FeaturesHeader",
+                fontSize=10,
                 textColor=dark_gray,
                 fontName="Helvetica-Bold",
                 leftIndent=10,
-                rightIndent=10,
-                spaceAfter=8,
-                backColor=colors.HexColor("#e5e7eb"),
-                borderPadding=8,
-            )
-            story.append(Paragraph(f"{i+1}. {pkg['name'].upper()}", header_style))
+                spaceAfter=4,
+            ),
+        )
+        story.append(features_header)
 
-            # Package description with word wrapping
-            desc_style = ParagraphStyle(
-                "PackageDesc",
-                fontSize=10,
+        # Features list
+        for feature in package.get('features', []):
+            feature_style = ParagraphStyle(
+                "FeatureItem",
+                fontSize=9,
                 textColor=light_gray,
-                fontName="Helvetica-Oblique",
-                leftIndent=10,
+                fontName="Helvetica",
+                leftIndent=20,
                 rightIndent=10,
-                spaceAfter=6,
-                wordWrap="LTR",
+                spaceAfter=3,
             )
-            story.append(Paragraph(pkg["description"], desc_style))
+            story.append(Paragraph(f"• {feature}", feature_style))
 
-            # Features header
-            features_header = Paragraph(
-                "Included Services:",
-                ParagraphStyle(
-                    "FeaturesHeader",
-                    fontSize=10,
-                    textColor=dark_gray,
-                    fontName="Helvetica-Bold",
-                    leftIndent=10,
-                    spaceAfter=4,
-                ),
-            )
-            story.append(features_header)
-
-            # Features list with better spacing
-            for feature in pkg["features"]:
-                feature_style = ParagraphStyle(
-                    "FeatureItem",
-                    fontSize=9,
-                    textColor=light_gray,
-                    fontName="Helvetica",
-                    leftIndent=20,
-                    rightIndent=10,
-                    spaceAfter=3,
-                    wordWrap="LTR",
-                )
-                story.append(Paragraph(f"• {feature}", feature_style))
-
-            story.append(Spacer(1, 12))
+        story.append(Spacer(1, 12))
 
     # Add minimal spacer before footer
     story.append(Spacer(1, 100))
