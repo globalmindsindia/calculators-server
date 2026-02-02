@@ -19,7 +19,7 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 from datetime import datetime
 import io
 import os
-from PyPDF2 import PdfWriter, PdfReader
+
 
 
 def generate_cost_report_pdf(user_data, expenses, selected_country, answers):
@@ -341,37 +341,6 @@ def generate_cost_report_pdf(user_data, expenses, selected_country, answers):
     # Build PDF (story contains main content; footer drawn via onPage)
     doc.build(story)
     buffer.seek(0)
-
-    # --- NEW: Merge with Study Abroad Package PDF ---
-    try:
-        package_pdf_path = os.path.join(
-            os.path.dirname(__file__), "..", "Study_Abroad_Package.pdf"
-        )
-        if os.path.exists(package_pdf_path):
-            # Create merged PDF
-            buffer.seek(0)
-            main_pdf = PdfReader(buffer)
-            package_pdf = PdfReader(package_pdf_path)
-
-            writer = PdfWriter()
-
-            # Add main report pages
-            for page in main_pdf.pages:
-                writer.add_page(page)
-
-            # Add package details pages
-            for page in package_pdf.pages:
-                writer.add_page(page)
-
-            # Write merged PDF
-            merged_buffer = io.BytesIO()
-            writer.write(merged_buffer)
-            merged_buffer.seek(0)
-            return merged_buffer
-    except Exception as e:
-        print(f"Could not merge package PDF: {e}")
-
-    buffer.seek(0)
     return buffer
 
 
@@ -685,36 +654,6 @@ def generate_custom_package_pdf(user_data, selected_packages, total_cost):
 
     # Build PDF
     doc.build(story)
-
-    # Merge with Study Abroad Package PDF
-    try:
-        package_pdf_path = os.path.join(
-            os.path.dirname(__file__), "..", "Study_Abroad_Package.pdf"
-        )
-        if os.path.exists(package_pdf_path):
-            # Create merged PDF
-            buffer.seek(0)
-            main_pdf = PdfReader(buffer)
-            package_pdf = PdfReader(package_pdf_path)
-
-            writer = PdfWriter()
-
-            # Add main report pages
-            for page in main_pdf.pages:
-                writer.add_page(page)
-
-            # Add package details pages
-            for page in package_pdf.pages:
-                writer.add_page(page)
-
-            # Write merged PDF
-            merged_buffer = io.BytesIO()
-            writer.write(merged_buffer)
-            merged_buffer.seek(0)
-            return merged_buffer
-    except Exception as e:
-        print(f"Could not merge package PDF: {e}")
-
     buffer.seek(0)
     return buffer
 

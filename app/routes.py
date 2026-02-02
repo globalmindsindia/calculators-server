@@ -40,6 +40,14 @@ bucket_mapping = {
 
 main = Blueprint('main', __name__)
 
+@main.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
 # Health check endpoint
 @main.route('/api/health')
 def health_check():
@@ -47,8 +55,10 @@ def health_check():
 
 # ============ COST CALCULATOR ENDPOINTS ============
 
-@main.route('/api/cost-calculator/calculate', methods=['POST'])
+@main.route('/api/cost-calculator/calculate', methods=['POST', 'OPTIONS'])
 def calculate_cost():
+    if request.method == 'OPTIONS':
+        return '', 200
     print("=== NEW CODE IS RUNNING ===")
     try:
         data = request.get_json()
@@ -78,8 +88,10 @@ def calculate_cost():
         print(f"ERROR: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-@main.route('/api/cost-calculator/user-details', methods=['POST'])
+@main.route('/api/cost-calculator/user-details', methods=['POST', 'OPTIONS'])
 def store_cost_user_details():
+    if request.method == 'OPTIONS':
+        return '', 200
     try:
         data = request.get_json()
         new_user = UserSubmission(
@@ -197,8 +209,10 @@ def store_grade_user_details():
 
 # ============ PDF GENERATION ENDPOINTS ============
 
-@main.route('/api/cost-calculator/download-pdf', methods=['POST'])
+@main.route('/api/cost-calculator/download-pdf', methods=['POST', 'OPTIONS'])
 def download_cost_pdf():
+    if request.method == 'OPTIONS':
+        return '', 200
     try:
         data = request.get_json()
         

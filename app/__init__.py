@@ -38,11 +38,11 @@ def create_app():
                 "https://www.globalmindsindia.com",
                 "http://localhost:3000"
             ],
-            "methods": ["GET", "POST", "OPTIONS"],
-            "headers": ["Content-Type", "Authorization"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
         }
-    })
+    }, send_wildcard=False)
     db.init_app(app)
     migrate.init_app(app, db)
 
