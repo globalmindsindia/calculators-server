@@ -101,6 +101,7 @@ def store_cost_user_details():
         return '', 200
     try:
         data = request.get_json()
+        print(f"Received data: {data}")
         new_user = UserSubmission(
             name=data.get('name'),
             emailid=data.get('email'),
@@ -112,7 +113,9 @@ def store_cost_user_details():
         return jsonify({"message": "User details saved"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Failed to save request'}), 500
+        print(f"Error in store_cost_user_details: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({'error': f'Failed to save request: {str(e)}'}), 500
 
 @main.route('/api/cost-calculator/request-callback', methods=['POST', 'OPTIONS'])
 def request_callback():
@@ -232,6 +235,7 @@ def download_cost_pdf():
         return '', 200
     try:
         data = request.get_json()
+        print(f"PDF Request data: {data}")
         
         # Store download request
         new_user = ReportSubmission(
@@ -261,6 +265,8 @@ def download_cost_pdf():
         )
         
     except Exception as e:
+        print(f"Error in download_cost_pdf: {str(e)}")
+        print(traceback.format_exc())
         return jsonify({'error': f'Failed to generate PDF: {str(e)}'}), 500
 
 @main.route('/api/cost-calculator/download-custom-package-pdf', methods=['POST', 'OPTIONS'])
