@@ -42,10 +42,17 @@ main = Blueprint('main', __name__)
 
 @main.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    origin = request.headers.get('Origin')
+    allowed_origins = [
+        'https://calculator.globalmindsindia.com',
+        'https://www.globalmindsindia.com',
+        'http://localhost:3000'
+    ]
+    if origin in allowed_origins:
+        response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+        response.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response
 
 # Health check endpoint
@@ -107,8 +114,10 @@ def store_cost_user_details():
         db.session.rollback()
         return jsonify({'error': 'Failed to save request'}), 500
 
-@main.route('/api/cost-calculator/request-callback', methods=['POST'])
+@main.route('/api/cost-calculator/request-callback', methods=['POST', 'OPTIONS'])
 def request_callback():
+    if request.method == 'OPTIONS':
+        return '', 200
     try:
         data = request.get_json()
         new_request = RequestCallBack(
@@ -122,8 +131,10 @@ def request_callback():
         db.session.rollback()
         return jsonify({'error': 'Failed to save request'}), 500
 
-@main.route('/api/cost-calculator/calculate-custom-package', methods=['POST'])
+@main.route('/api/cost-calculator/calculate-custom-package', methods=['POST', 'OPTIONS'])
 def calculate_custom_package():
+    if request.method == 'OPTIONS':
+        return '', 200
     print("=== CALCULATE CUSTOM PACKAGE ENDPOINT HIT ===")
     try:
         data = request.get_json()
@@ -155,8 +166,10 @@ def calculate_custom_package():
         print(f"DEBUG ROUTE: Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-@main.route('/api/cost-calculator/download-request', methods=['POST'])
+@main.route('/api/cost-calculator/download-request', methods=['POST', 'OPTIONS'])
 def store_download_request():
+    if request.method == 'OPTIONS':
+        return '', 200
     try:
         data = request.get_json()
         new_user = ReportSubmission(
@@ -175,8 +188,10 @@ def store_download_request():
 
 # ============ GRADE CALCULATOR ENDPOINTS ============
 
-@main.route('/api/grade-calculator/calculate', methods=['POST'])
+@main.route('/api/grade-calculator/calculate', methods=['POST', 'OPTIONS'])
 def calculate_grade():
+    if request.method == 'OPTIONS':
+        return '', 200
     try:
         data = request.get_json()
         best_grade = data.get('best_grade')
@@ -191,8 +206,10 @@ def calculate_grade():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@main.route('/api/grade-calculator/user-details', methods=['POST'])
+@main.route('/api/grade-calculator/user-details', methods=['POST', 'OPTIONS'])
 def store_grade_user_details():
+    if request.method == 'OPTIONS':
+        return '', 200
     try:
         data = request.get_json()
         new_user = GradeUserSubmission(
@@ -246,8 +263,10 @@ def download_cost_pdf():
     except Exception as e:
         return jsonify({'error': f'Failed to generate PDF: {str(e)}'}), 500
 
-@main.route('/api/cost-calculator/download-custom-package-pdf', methods=['POST'])
+@main.route('/api/cost-calculator/download-custom-package-pdf', methods=['POST', 'OPTIONS'])
 def download_custom_package_pdf():
+    if request.method == 'OPTIONS':
+        return '', 200
     try:
         data = request.get_json()
         
@@ -299,8 +318,10 @@ def download_custom_package_pdf():
         print(f"DEBUG: Error in download_custom_package_pdf: {str(e)}")
         return jsonify({'error': f'Failed to generate PDF: {str(e)}'}), 500
 
-@main.route('/api/grade-calculator/download-pdf', methods=['POST'])
+@main.route('/api/grade-calculator/download-pdf', methods=['POST', 'OPTIONS'])
 def download_grade_pdf():
+    if request.method == 'OPTIONS':
+        return '', 200
     try:
         data = request.get_json()
         
